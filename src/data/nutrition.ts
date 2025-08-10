@@ -261,6 +261,19 @@ export const MEAL_COMPOSITIONS: Record<string, Array<{ foodId: string; quantity:
     { foodId: "queijo_minas", quantity: 30 },
     { foodId: "cafe", quantity: 150 }
   ],
+  "bf-bisnaguitos": [
+    { foodId: "pao_integral", quantity: 75 }, // 3 mini pães integrais
+    { foodId: "queijo_minas", quantity: 30 },
+    { foodId: "requeijao_light", quantity: 15 }
+  ],
+  "bf-paoqueijo-frigideira": [
+    { foodId: "ovo", quantity: 120 }, // 2 ovos
+    { foodId: "requeijao_light", quantity: 20 },
+    { foodId: "queijo_minas", quantity: 20 },
+    { foodId: "banana", quantity: 75 },
+    { foodId: "aveia", quantity: 15 },
+    { foodId: "cafe", quantity: 150 }
+  ],
 
   // Snacks
   "sm-banana": [{ foodId: "banana", quantity: 75 }],
@@ -288,6 +301,11 @@ export const MEAL_COMPOSITIONS: Record<string, Array<{ foodId: string; quantity:
     { foodId: "couve", quantity: 100 },
     { foodId: "legumes_vapor", quantity: 100 }
   ],
+  "ln-almondega-brocolis": [
+    { foodId: "patinho_moido", quantity: 75 },
+    { foodId: "arroz_branco", quantity: 60 },
+    { foodId: "brocolis", quantity: 60 }
+  ],
 
   // Afternoon snacks
   "sa-iogurte-tribos": [
@@ -298,6 +316,15 @@ export const MEAL_COMPOSITIONS: Record<string, Array<{ foodId: string; quantity:
     { foodId: "banana", quantity: 150 }, // 2 bananas
     { foodId: "whey_protein", quantity: 30 },
     { foodId: "aveia", quantity: 15 }
+  ],
+  "sa-paes-requeijao": [
+    { foodId: "pao_integral", quantity: 100 },
+    { foodId: "requeijao_light", quantity: 30 },
+    { foodId: "queijo_minas", quantity: 30 }
+  ],
+  "sa-shake": [
+    { foodId: "banana", quantity: 150 },
+    { foodId: "whey_protein", quantity: 30 }
   ],
 
   // Dinner options
@@ -312,6 +339,15 @@ export const MEAL_COMPOSITIONS: Record<string, Array<{ foodId: string; quantity:
     { foodId: "patinho_moido", quantity: 75 },
     { foodId: "queijo_minas", quantity: 30 }
   ],
+  "dn-pizza-frigideira": [
+    { foodId: "pao_integral", quantity: 60 }, // wrap aproximado
+    { foodId: "frango_cozido", quantity: 80 },
+    { foodId: "queijo_minas", quantity: 30 }
+  ],
+  "dn-brusqueta-suco": [
+    { foodId: "pao_integral", quantity: 75 },
+    { foodId: "queijo_minas", quantity: 30 }
+  ],
 
   // Supper options
   "sp-iogurte-tribos": [
@@ -320,6 +356,10 @@ export const MEAL_COMPOSITIONS: Record<string, Array<{ foodId: string; quantity:
   "sp-iogurte-castanhas": [
     { foodId: "iogurte_pro", quantity: 170 },
     { foodId: "castanha_caju", quantity: 20 } // 8 units
+  ],
+  "sp-torrada-requeijao": [
+    { foodId: "pao_integral", quantity: 50 },
+    { foodId: "requeijao_light", quantity: 30 }
   ]
 }
 

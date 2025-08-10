@@ -231,6 +231,7 @@ export type Database = {
         Row: {
           api_key_gemini_encrypted: string | null
           created_at: string
+          daily_calorie_target: number
           email: string | null
           id: string
           name: string | null
@@ -240,6 +241,7 @@ export type Database = {
         Insert: {
           api_key_gemini_encrypted?: string | null
           created_at?: string
+          daily_calorie_target?: number
           email?: string | null
           id: string
           name?: string | null
@@ -249,6 +251,7 @@ export type Database = {
         Update: {
           api_key_gemini_encrypted?: string | null
           created_at?: string
+          daily_calorie_target?: number
           email?: string | null
           id?: string
           name?: string | null

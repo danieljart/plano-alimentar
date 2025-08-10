@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, Heart, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/components/ui/use-toast'
 
 interface FoodCategory {
   id: string
@@ -14,17 +16,25 @@ interface FoodCategory {
   foods: Array<{ id: string; name: string; image?: string }>
 }
 
+// Categorias revisadas conforme instruções (proteínas sem laticínios; itens acessíveis no BR)
+// Laticínios ficam em categoria própria separada
 const FOOD_CATEGORIES: FoodCategory[] = [
   {
     id: 'proteins',
-    name: 'Proteínas',
+    name: 'Proteínas (Misturas)',
     icon: '🥩',
     foods: [
-      { id: 'chicken', name: 'Frango', image: '/api/placeholder/80/80' },
-      { id: 'fish', name: 'Peixe', image: '/api/placeholder/80/80' },
-      { id: 'eggs', name: 'Ovos', image: '/api/placeholder/80/80' },
-      { id: 'beans', name: 'Feijão', image: '/api/placeholder/80/80' },
-      { id: 'lentils', name: 'Lentilha', image: '/api/placeholder/80/80' },
+      { id: 'carne_bovina_patinho', name: 'Carne bovina (patinho)', image: '/api/placeholder/80/80' },
+      { id: 'carne_bovina_alcatra', name: 'Carne bovina (alcatra)', image: '/api/placeholder/80/80' },
+      { id: 'frango_peito', name: 'Frango (peito)', image: '/api/placeholder/80/80' },
+      { id: 'frango_coxa', name: 'Frango (coxa)', image: '/api/placeholder/80/80' },
+      { id: 'peixe_tilapia', name: 'Peixe (tilápia)', image: '/api/placeholder/80/80' },
+      { id: 'peixe_sardinha', name: 'Peixe (sardinha)', image: '/api/placeholder/80/80' },
+      { id: 'ovos', name: 'Ovos', image: '/api/placeholder/80/80' },
+      { id: 'lentilha', name: 'Lentilha', image: '/api/placeholder/80/80' },
+      { id: 'grao_de_bico', name: 'Grão de bico', image: '/api/placeholder/80/80' },
+      { id: 'feijao', name: 'Feijão', image: '/api/placeholder/80/80' },
+      { id: 'tofu', name: 'Tofu', image: '/api/placeholder/80/80' },
     ]
   },
   {
@@ -32,23 +42,34 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     name: 'Carboidratos',
     icon: '🌾',
     foods: [
-      { id: 'rice', name: 'Arroz', image: '/api/placeholder/80/80' },
+      { id: 'arroz_integral', name: 'Arroz integral', image: '/api/placeholder/80/80' },
+      { id: 'macarrao_integral', name: 'Macarrão integral', image: '/api/placeholder/80/80' },
+      { id: 'batata_doce', name: 'Batata-doce', image: '/api/placeholder/80/80' },
+      { id: 'mandioca', name: 'Mandioca', image: '/api/placeholder/80/80' },
+      { id: 'cuscuz', name: 'Cuscuz', image: '/api/placeholder/80/80' },
+      { id: 'tapioca', name: 'Tapioca', image: '/api/placeholder/80/80' },
+      { id: 'pao_integral', name: 'Pão integral', image: '/api/placeholder/80/80' },
+      { id: 'aveia', name: 'Aveia', image: '/api/placeholder/80/80' },
       { id: 'quinoa', name: 'Quinoa', image: '/api/placeholder/80/80' },
-      { id: 'sweet_potato', name: 'Batata-doce', image: '/api/placeholder/80/80' },
-      { id: 'oats', name: 'Aveia', image: '/api/placeholder/80/80' },
-      { id: 'pasta', name: 'Macarrão integral', image: '/api/placeholder/80/80' },
     ]
   },
   {
     id: 'vegetables',
-    name: 'Vegetais',
+    name: 'Legumes e Verduras',
     icon: '🥬',
     foods: [
-      { id: 'broccoli', name: 'Brócolis', image: '/api/placeholder/80/80' },
-      { id: 'spinach', name: 'Espinafre', image: '/api/placeholder/80/80' },
-      { id: 'carrots', name: 'Cenoura', image: '/api/placeholder/80/80' },
-      { id: 'kale', name: 'Couve', image: '/api/placeholder/80/80' },
-      { id: 'tomatoes', name: 'Tomate', image: '/api/placeholder/80/80' },
+      { id: 'brocolis', name: 'Brócolis', image: '/api/placeholder/80/80' },
+      { id: 'couve_flor', name: 'Couve-flor', image: '/api/placeholder/80/80' },
+      { id: 'cenoura', name: 'Cenoura', image: '/api/placeholder/80/80' },
+      { id: 'abobrinha', name: 'Abobrinha', image: '/api/placeholder/80/80' },
+      { id: 'berinjela', name: 'Berinjela', image: '/api/placeholder/80/80' },
+      { id: 'espinafre', name: 'Espinafre', image: '/api/placeholder/80/80' },
+      { id: 'alface', name: 'Alface', image: '/api/placeholder/80/80' },
+      { id: 'tomate', name: 'Tomate', image: '/api/placeholder/80/80' },
+      { id: 'pepino', name: 'Pepino', image: '/api/placeholder/80/80' },
+      { id: 'vagem', name: 'Vagem', image: '/api/placeholder/80/80' },
+      { id: 'quiabo', name: 'Quiabo', image: '/api/placeholder/80/80' },
+      { id: 'pimentao', name: 'Pimentão', image: '/api/placeholder/80/80' },
     ]
   },
   {
@@ -57,24 +78,56 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     icon: '🍎',
     foods: [
       { id: 'banana', name: 'Banana', image: '/api/placeholder/80/80' },
-      { id: 'apple', name: 'Maçã', image: '/api/placeholder/80/80' },
-      { id: 'berries', name: 'Frutas vermelhas', image: '/api/placeholder/80/80' },
-      { id: 'orange', name: 'Laranja', image: '/api/placeholder/80/80' },
-      { id: 'papaya', name: 'Mamão', image: '/api/placeholder/80/80' },
+      { id: 'maca', name: 'Maçã', image: '/api/placeholder/80/80' },
+      { id: 'morango', name: 'Morango', image: '/api/placeholder/80/80' },
+      { id: 'uva', name: 'Uva', image: '/api/placeholder/80/80' },
+      { id: 'laranja', name: 'Laranja', image: '/api/placeholder/80/80' },
+      { id: 'abacaxi', name: 'Abacaxi', image: '/api/placeholder/80/80' },
+      { id: 'mamao', name: 'Mamão', image: '/api/placeholder/80/80' },
+      { id: 'manga', name: 'Manga', image: '/api/placeholder/80/80' },
+      { id: 'melancia', name: 'Melancia', image: '/api/placeholder/80/80' },
+      { id: 'pera', name: 'Pera', image: '/api/placeholder/80/80' },
+      { id: 'ameixa', name: 'Ameixa', image: '/api/placeholder/80/80' },
     ]
   },
   {
     id: 'fats',
-    name: 'Gorduras Saudáveis',
+    name: 'Gorduras Boas',
     icon: '🥑',
     foods: [
-      { id: 'avocado', name: 'Abacate', image: '/api/placeholder/80/80' },
-      { id: 'nuts', name: 'Castanhas', image: '/api/placeholder/80/80' },
-      { id: 'olive_oil', name: 'Azeite', image: '/api/placeholder/80/80' },
-      { id: 'chia', name: 'Chia', image: '/api/placeholder/80/80' },
-      { id: 'flaxseed', name: 'Linhaça', image: '/api/placeholder/80/80' },
+      { id: 'abacate', name: 'Abacate', image: '/api/placeholder/80/80' },
+      { id: 'azeite_extra_virgem', name: 'Azeite extra virgem', image: '/api/placeholder/80/80' },
+      { id: 'castanha_caju', name: 'Castanha de caju', image: '/api/placeholder/80/80' },
+      { id: 'castanha_para', name: 'Castanha do Pará', image: '/api/placeholder/80/80' },
+      { id: 'amendoas', name: 'Amêndoas', image: '/api/placeholder/80/80' },
+      { id: 'nozes', name: 'Nozes', image: '/api/placeholder/80/80' },
+      { id: 'chia', name: 'Semente de chia', image: '/api/placeholder/80/80' },
+      { id: 'linhaca', name: 'Semente de linhaça', image: '/api/placeholder/80/80' },
+      { id: 'girassol', name: 'Semente de girassol', image: '/api/placeholder/80/80' },
     ]
-  }
+  },
+  {
+    id: 'snacks',
+    name: 'Snacks Saudáveis',
+    icon: '🍿',
+    foods: [
+      { id: 'pipoca', name: 'Pipoca (sem óleo)', image: '/api/placeholder/80/80' },
+      { id: 'biscoito_arroz', name: 'Biscoito de arroz', image: '/api/placeholder/80/80' },
+      { id: 'frutas_secas', name: 'Frutas secas', image: '/api/placeholder/80/80' },
+      { id: 'ovos_cozidos', name: 'Ovos cozidos', image: '/api/placeholder/80/80' },
+      { id: 'palitos_vegetais', name: 'Palitos de cenoura/pepino', image: '/api/placeholder/80/80' },
+    ]
+  },
+  {
+    id: 'dairy',
+    name: 'Laticínios e Derivados',
+    icon: '🧀',
+    foods: [
+      { id: 'leite', name: 'Leite', image: '/api/placeholder/80/80' },
+      { id: 'queijo_minas', name: 'Queijo minas', image: '/api/placeholder/80/80' },
+      { id: 'iogurte_natural', name: 'Iogurte natural', image: '/api/placeholder/80/80' },
+    ]
+  },
 ]
 
 interface PreferencesOnboardingProps {
@@ -86,6 +139,34 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set(['proteins']))
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
+  const [dailyCalories, setDailyCalories] = useState<number>(1500)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    // Restaurar preferências locais e meta calórica do perfil
+    try {
+      const raw = localStorage.getItem('selectedFoods')
+      if (raw) {
+        const parsed: string[] = JSON.parse(raw)
+        setSelectedFoods(new Set(parsed))
+      }
+    } catch (e) {
+      console.log('No local selectedFoods yet')
+    }
+
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const { data } = await supabase
+        .from('profiles')
+        .select('daily_calorie_target')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (data?.daily_calorie_target) {
+        setDailyCalories(Number(data.daily_calorie_target))
+      }
+    })
+  }, [])
 
   const filteredCategories = FOOD_CATEGORIES.map(category => ({
     ...category,
@@ -103,9 +184,8 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
     }
     setSelectedFoods(newSelected)
     
-    // Gentle haptic feedback
     if ('vibrate' in navigator) {
-      navigator.vibrate(50)
+      navigator.vibrate(30)
     }
   }
 
@@ -121,30 +201,35 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
 
   const handleSubmit = async () => {
     setLoading(true)
-    
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Usuário não encontrado')
 
-      // Save preferences to database
-      const preferences = Array.from(selectedFoods).map(foodId => ({
-        user_id: user.id,
-        food_item_id: foodId,
-        preference_level: 5 // High preference for selected items
-      }))
-
-      await supabase.from('user_preferences').insert(preferences)
-      
-      // Update profile to mark preferences as completed
+      // Persistir meta calórica e marcar onboarding concluído
       await supabase
         .from('profiles')
-        .update({ preferences_completed: true })
+        .update({ 
+          preferences_completed: true,
+          daily_calorie_target: Math.max(1000, Math.min(4000, Number(dailyCalories) || 1500))
+        })
         .eq('id', user.id)
+
+      // Guardar preferências localmente (evitamos inconsistências em user_preferences sem catálogo de food_items)
+      localStorage.setItem('selectedFoods', JSON.stringify(Array.from(selectedFoods)))
+
+      toast({
+        title: 'Preferências salvas',
+        description: 'Suas preferências e meta calórica foram atualizadas.',
+      })
 
       onComplete()
     } catch (error) {
       console.error('Error saving preferences:', error)
-      alert('Erro ao salvar preferências. Tente novamente.')
+      toast({
+        title: 'Erro ao salvar',
+        description: 'Não foi possível salvar suas preferências. Tente novamente.',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -163,14 +248,34 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
                 Vamos personalizar seu plano!
               </CardTitle>
               <CardDescription className="text-base">
-                Selecione os alimentos que você mais gosta. Isso nos ajudará a criar 
-                o plano alimentar perfeito para você.
+                Selecione os alimentos que você mais gosta e informe sua meta calórica diária.
               </CardDescription>
             </div>
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Search */}
+            {/* Campo meta calórica diária */}
+            <div className="grid grid-cols-1 gap-2">
+              <label htmlFor="kcal" className="text-sm font-medium text-muted-foreground">
+                Meta calórica diária (kcal)
+              </label>
+              <Input
+                id="kcal"
+                type="number"
+                inputMode="numeric"
+                min={1000}
+                max={4000}
+                step={50}
+                value={dailyCalories}
+                onChange={(e) => setDailyCalories(Number(e.target.value))}
+                className="h-12"
+              />
+              <p className="text-xs text-muted-foreground">
+                Usaremos essa meta para ajustar automaticamente o seu plano alimentar.
+              </p>
+            </div>
+
+            {/* Busca */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -181,14 +286,14 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
               />
             </div>
 
-            {/* Progress indicator */}
+            {/* Indicador de progresso */}
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {selectedFoods.size} alimento{selectedFoods.size !== 1 ? 's' : ''} selecionado{selectedFoods.size !== 1 ? 's' : ''}
               </p>
             </div>
 
-            {/* Food categories */}
+            {/* Categorias */}
             <div className="space-y-4">
               {filteredCategories.map((category) => {
                 const selectedCount = category.foods.filter(food => selectedFoods.has(food.id)).length
@@ -261,7 +366,7 @@ export function PreferencesOnboarding({ onComplete }: PreferencesOnboardingProps
               })}
             </div>
 
-            {/* Submit button */}
+            {/* Botão salvar */}
             <div className="pt-6">
               <Button
                 onClick={handleSubmit}

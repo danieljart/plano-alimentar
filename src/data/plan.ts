@@ -154,17 +154,17 @@ export const MEAL_OPTIONS: Record<MealType, MealOption[]> = {
       label: "Pães integrais + queijo",
       items: [
         "2 pães integrais ou bisnaguinhas",
-        "2 col. sopa de requeijão light",
+        "2 col. sopa de requeijão",
         "2 fatias pequenas de queijo minas",
         "1 col. chá de orégano seco",
       ],
     },
     {
       id: "sa-iogurte-tribos",
-      label: "Iogurte + Tribos",
+      label: "Iogurte + biscoito integral de cacau",
       items: [
-        "1 copinho (120g) Iogurte Pro Itambé – Morango",
-        "7 unidades biscoito Tribos Cacau – Mãe Terra",
+        "1 potinho (120g) de iogurte proteico",
+        "7 unidades de biscoito integral de cacau",
       ],
     },
     {
@@ -172,7 +172,7 @@ export const MEAL_OPTIONS: Record<MealType, MealOption[]> = {
       label: "Banana com whey",
       items: [
         "2 bananas médias",
-        "1 dosador de whey (100% pure – Integralmédica)",
+        "1 dosador de whey (sem marca)",
         "1 col. sopa de aveia ou 1 col. sobremesa de chia",
       ],
     },
@@ -211,7 +211,7 @@ export const MEAL_OPTIONS: Record<MealType, MealOption[]> = {
       id: "dn-pizza-frigideira",
       label: "Pizza de frigideira",
       items: [
-        "1 unidade de Rap10 integral",
+        "1 unidade de pão folha integral (wrap)",
         "Frango ou carne + queijo + molho de tomate",
         "Temperos: orégano, tomate, etc.",
       ],
@@ -230,10 +230,10 @@ export const MEAL_OPTIONS: Record<MealType, MealOption[]> = {
   supper: [
     {
       id: "sp-iogurte-tribos",
-      label: "Iogurte Pro + Tribos",
+      label: "Iogurte + biscoito integral",
       items: [
-        "1 iogurte Pro Itambé – Morango (120g)",
-        "4 unidades de biscoito Tribos Cacau – Mãe Terra",
+        "1 iogurte proteico (120g)",
+        "4 unidades de biscoito integral de cacau",
       ],
     },
     {
@@ -248,7 +248,7 @@ export const MEAL_OPTIONS: Record<MealType, MealOption[]> = {
       id: "sp-iogurte-castanhas",
       label: "Iogurte + castanhas",
       items: [
-        "1 pote de Iogurte Itambé Fit (170g) ou desnatado (150g)",
+        "1 pote de iogurte proteico (170g) ou desnatado (150g)",
         "8 unidades de castanha de caju torrada sem sal",
       ],
     },

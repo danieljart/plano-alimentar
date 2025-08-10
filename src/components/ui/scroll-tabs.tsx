@@ -29,16 +29,37 @@ interface ScrollTabsContentProps {
 const ScrollTabsContext = React.createContext<{
   value?: string
   onValueChange?: (value: string) => void
+  values?: string[]
+  registerValue?: (value: string) => void
 }>({})
 
 const ScrollTabs = React.forwardRef<HTMLDivElement, ScrollTabsProps>(
   ({ children, className, defaultValue, value, onValueChange, ...props }, ref) => {
-    const [internalValue, setInternalValue] = React.useState(defaultValue || "")
+    const initial = React.useMemo(() => {
+      if (typeof window !== 'undefined') {
+        return localStorage.getItem('selectedDayId') || defaultValue || ""
+      }
+      return defaultValue || ""
+    }, [defaultValue])
+
+    const [internalValue, setInternalValue] = React.useState(initial)
+    const [values, setValues] = React.useState<string[]>([])
     const currentValue = value !== undefined ? value : internalValue
-    const handleValueChange = value !== undefined ? onValueChange : setInternalValue
+    const handleValueChange = (val: string) => {
+      if (value !== undefined) {
+        onValueChange?.(val)
+      } else {
+        setInternalValue(val)
+      }
+      try { localStorage.setItem('selectedDayId', val) } catch {}
+    }
+
+    const registerValue = React.useCallback((v: string) => {
+      setValues(prev => (prev.includes(v) ? prev : [...prev, v]))
+    }, [])
 
     return (
-      <ScrollTabsContext.Provider value={{ value: currentValue, onValueChange: handleValueChange }}>
+      <ScrollTabsContext.Provider value={{ value: currentValue, onValueChange: handleValueChange, values, registerValue }}>
         <div ref={ref} className={className} {...props}>
           {children}
         </div>
@@ -74,6 +95,10 @@ const ScrollTabsTrigger = React.forwardRef<HTMLButtonElement, ScrollTabsTriggerP
     const context = React.useContext(ScrollTabsContext)
     const isActive = context.value === value
 
+    React.useEffect(() => {
+      context.registerValue?.(value)
+    }, [value])
+
     return (
       <button
         ref={ref}
@@ -84,12 +109,11 @@ const ScrollTabsTrigger = React.forwardRef<HTMLButtonElement, ScrollTabsTriggerP
           "disabled:pointer-events-none disabled:opacity-50",
           isActive 
             ? "bg-gradient-to-r from-primary to-[hsl(334_80%_65%)] text-primary-foreground shadow-lg scale-105" 
-            : "text-primary hover:bg-accent hover:text-accent-foreground hover:scale-105",
+            : "text-[hsl(var(--primary-dark))] border-b-2 border-[hsl(var(--primary-dark))] hover:bg-accent hover:text-accent-foreground hover:scale-105",
           className
         )}
         onClick={() => {
           context.onValueChange?.(value)
-          // Gentle haptic feedback
           if ('vibrate' in navigator) {
             navigator.vibrate(50)
           }
@@ -108,7 +132,29 @@ const ScrollTabsContent = React.forwardRef<HTMLDivElement, ScrollTabsContentProp
     const context = React.useContext(ScrollTabsContext)
     const isActive = context.value === value
 
+    const startX = React.useRef<number | null>(null)
+
     if (!isActive) return null
+
+    const onTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+      startX.current = e.touches[0].clientX
+    }
+
+    const onTouchEnd: React.TouchEventHandler<HTMLDivElement> = (e) => {
+      if (startX.current == null) return
+      const dx = e.changedTouches[0].clientX - startX.current
+      const threshold = 50
+      const vals = context.values || []
+      const idx = vals.indexOf(value)
+      if (Math.abs(dx) > threshold && idx !== -1) {
+        if (dx < 0 && idx < vals.length - 1) {
+          context.onValueChange?.(vals[idx + 1])
+        } else if (dx > 0 && idx > 0) {
+          context.onValueChange?.(vals[idx - 1])
+        }
+      }
+      startX.current = null
+    }
 
     return (
       <div
@@ -118,6 +164,8 @@ const ScrollTabsContent = React.forwardRef<HTMLDivElement, ScrollTabsContentProp
           "animate-in fade-in-50 duration-300",
           className
         )}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         {...props}
       >
         {children}

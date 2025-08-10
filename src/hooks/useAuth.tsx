@@ -8,6 +8,7 @@ interface Profile {
   email?: string
   preferences_completed: boolean
   api_key_gemini_encrypted?: string
+  daily_calorie_target?: number
 }
 
 interface AuthContextType {

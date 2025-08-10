@@ -110,6 +110,8 @@ const DayView: React.FC<{ day: DayPlan; openMeal: string; setOpenMeal: (meal: st
     supper: day.meals.supper.optionId,
   }));
 
+  const { profile } = useAuth();
+
   const dayNutrition = useMemo(() => {
     const meals = Object.entries(selection).map(([type, optionId]) => getMealNutrition(optionId));
     return meals.reduce((total, meal) => ({
@@ -133,7 +135,7 @@ const DayView: React.FC<{ day: DayPlan; openMeal: string; setOpenMeal: (meal: st
             <div className="flex items-center gap-4">
               <CalorieBadge calories={dayNutrition.calories} className="text-lg px-4 py-2" />
               <div className="text-sm text-muted-foreground">
-                Meta: 1500 kcal
+                Meta: {profile?.daily_calorie_target ?? 1500} kcal
               </div>
             </div>
           </div>
@@ -177,21 +179,8 @@ function AppContent() {
   
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <SEO title="Plano alimentar 1500 kcal • Variações por dia" description="Plano alimentar semanal 1500 kcal com variações, horários ajustados e alternativas por refeição." canonical={canonical} />
+      <SEO title="Plano alimentar • Variações por dia" description="Plano alimentar semanal personalizado com variações, horários e alternativas por refeição." canonical={canonical} />
       
-      <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-40">
-        <div className="container mx-auto py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gradient">Plano Alimentar</h1>
-              <p className="text-sm text-muted-foreground">1500 kcal • Personalizado</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              Imprimir
-            </Button>
-          </div>
-        </div>
-      </header>
 
       <main className="container mx-auto py-6 px-4">
         <ScrollTabs defaultValue={WEEK_PLAN[0].id}>

@@ -91,7 +91,7 @@ const MealAccordionTrigger = React.forwardRef<HTMLButtonElement, MealAccordionTr
       <button
         ref={ref}
         className={cn(
-          "flex flex-1 items-center justify-between w-full p-4 text-left",
+          "flex flex-1 items-center justify-between w-full p-4 min-h-[60px] text-left",
           "hover:bg-accent/50 transition-colors duration-200",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           className
